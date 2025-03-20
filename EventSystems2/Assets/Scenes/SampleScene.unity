@@ -2843,6 +2843,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectionRange: 1.47
+  detectionFovAngle: 0
 --- !u!114 &1198570864
 MonoBehaviour:
   m_ObjectHideFlags: 0

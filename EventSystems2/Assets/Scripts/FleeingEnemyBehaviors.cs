@@ -11,7 +11,7 @@ public enum FleeingEnemyStates
 
 public class FleeingEnemyBehaviors : MonoBehaviour
 {
-    public float detectionRange;
+    public float detectionRange, detectionFovAngle;
     //
     private PlayerMovement playerRef;
     private Damageable myDamageable;
@@ -65,6 +65,10 @@ public class FleeingEnemyBehaviors : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
+        //range circle
         Gizmos.DrawWireSphere(transform.position, detectionRange);
+
+        // 2 lines denoting vision cone
+        Gizmos.DrawLine(transform.position, transform.position);   
     }
 }
