@@ -20,6 +20,11 @@ public class SwordCollider : MonoBehaviour
             {
                 damageable.TakeDamage(sword.swordDamage);
             }
+            //else if (other.gameObject.GetComponentInParent<Damageable>() != null)
+            //{
+            //    //print("aaa");
+            //    other.gameObject.GetComponentInParent<Damageable>().TakeDamage(sword.swordDamage);
+            //}
         }
     }
 }
