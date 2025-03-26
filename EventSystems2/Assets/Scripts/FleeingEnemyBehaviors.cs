@@ -38,6 +38,7 @@ public class FleeingEnemyBehaviors : MonoBehaviour
         myAnimator.SetTrigger("Alerted");
     }
 
+    //called on update in Enemy_Fleeing_Idle
     public bool IsAlerted()
     {
         Vector3 directionToPlayer = (playerRef.transform.position - transform.position).normalized;
@@ -55,11 +56,25 @@ public class FleeingEnemyBehaviors : MonoBehaviour
         return false;
     }
 
+    //called after "Alerted" animation finishes
     public void GoToFlee()
     {
         if (myAnimator != null)
         {
             myAnimator.SetTrigger("AlertIsDone");
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        PlayerHealth healthRef = other.GetComponent<PlayerHealth>();
+        if (healthRef != null)
+        {
+            healthRef.TakeDamage(200);
+        }
+        else
+        {
+            Debug.Log("Enemy Collision. No player ref attached to collision.");
         }
     }
     private void OnDrawGizmos()
@@ -68,7 +83,9 @@ public class FleeingEnemyBehaviors : MonoBehaviour
         //range circle
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
-        // 2 lines denoting vision cone
-        Gizmos.DrawLine(transform.position, transform.position);   
+        // 2 lines denoting vision cone?
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(transform.position, transform.position + (detectionRange * transform.up));
+        Gizmos.DrawLine(transform.position, transform.position + (detectionRange * transform.up));
     }
 }
