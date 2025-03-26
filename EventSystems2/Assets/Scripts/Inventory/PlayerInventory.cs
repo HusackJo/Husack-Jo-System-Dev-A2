@@ -13,10 +13,10 @@ public class PlayerInventory : MonoBehaviour
     //
     public InventoryUI inventoryUI { get; private set; }
 
-    private void Awake()
-    {
-        inventoryUI = FindAnyObjectByType<InventoryUI>().GetComponent<InventoryUI>();
-    }
+    //private void Awake()
+    //{
+    //    inventoryUI = FindAnyObjectByType<InventoryUI>().GetComponent<InventoryUI>();
+    //}
 
     private void Update()
     {

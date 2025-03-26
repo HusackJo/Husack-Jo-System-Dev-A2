@@ -1,13 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 
 
 public class FleeingEnemyBehaviors : MonoBehaviour
 {
+    public float angleToPlayer;
     public float detectionRange, detectionFovAngle;
     //
+    private GameManager gameManager;
     private NavMeshAgent navAgent;
     private PlayerMovement playerRef;
     private Damageable myDamageable;
@@ -16,18 +20,17 @@ public class FleeingEnemyBehaviors : MonoBehaviour
 
     private void Awake()
     {
+        gameManager = FindObjectOfType<GameManager>().GetComponent<GameManager>();
+        gameManager.spawnPlayer += GetPlayerRef; 
         navAgent = GetComponent<NavMeshAgent>();
         myDamageable = GetComponent<Damageable>();
         myAnimator = GetComponent<Animator>();
         myDamageable.hasTakenDamage += TakeDamage;
     }
 
-    private void Update()
+    private void GetPlayerRef()
     {
-        if (playerRef == null)
-        {
-            FindObjectOfType<PlayerMovement>().TryGetComponent<PlayerMovement>(out playerRef);
-        }
+        playerRef = FindObjectOfType<PlayerMovement>().GetComponent<PlayerMovement>();
     }
 
     public void TakeDamage()
@@ -38,19 +41,33 @@ public class FleeingEnemyBehaviors : MonoBehaviour
     //called on update in Enemy_Fleeing_Idle, returns true when detecting player.
     public bool IdleStateBehaviors()
     {
-        Vector3 directionToPlayer = (playerRef.transform.position - transform.position).normalized;
-
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRange))
+        if (playerRef != null)
         {
-            if (hit.transform == playerRef.transform)
+            //angletoplayer = vector3.angle(forward, directiontoplayer)
+            Vector3 directionToPlayer = (playerRef.transform.position - transform.position).normalized;
+            angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+
+            if (angleToPlayer < transform.rotation.z + detectionFovAngle/2)
             {
-                Debug.Log($"Enemy: {name} detected player!");
-                return true;
-                //myAnimator.SetTrigger("Alerted");
+                RaycastHit hit;
+                if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRange))
+                {
+                    if (hit.transform == playerRef.transform)
+                    {
+                        Debug.Log($"Enemy: {name} detected player!");
+                        return true;
+                        //myAnimator.SetTrigger("Alerted");
+                    }
+                }
             }
-        } 
+        }
         return false;
+    }
+
+    public void IdleStateRotations()
+    {
+        this.transform.parent.Rotate(new Vector3(0, 0, UnityEngine.Random.Range(-90, 90)));
+        
     }
 
     //called after "Alerted" animation finishes
@@ -69,6 +86,7 @@ public class FleeingEnemyBehaviors : MonoBehaviour
     // called in update in flee state
     public void RunAwayBehaviors()
     {
+        navAgent.updateRotation = true;
         navAgent.SetDestination(transform.position + (this.transform.position - playerRef.transform.position));
     }
 
@@ -91,8 +109,13 @@ public class FleeingEnemyBehaviors : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
         // 2 lines denoting vision cone?
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(transform.position, transform.position + (detectionRange * transform.up));
-        Gizmos.DrawLine(transform.position, transform.position + (detectionRange * transform.up));
+        float halfFOV = detectionFovAngle / 2;
+        Quaternion leftRayRotation = Quaternion.AngleAxis(-halfFOV, Vector3.forward );
+        Quaternion rightRayRotation = Quaternion.AngleAxis(halfFOV, Vector3.forward );
+        Vector3 leftRayDirection = leftRayRotation * transform.up ;
+        Vector3 rightRayDirection = rightRayRotation * transform.up ;
+        Gizmos.DrawRay(transform.position, leftRayDirection * detectionRange);
+        Gizmos.DrawRay(transform.position, rightRayDirection * detectionRange);
     }
 }
+
