@@ -1,18 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
-public enum FleeingEnemyStates
-{
-    IDLE,
-    ALERT,
-    FLEE,
-}
 
 public class FleeingEnemyBehaviors : MonoBehaviour
 {
     public float detectionRange, detectionFovAngle;
     //
+    private NavMeshAgent navAgent;
     private PlayerMovement playerRef;
     private Damageable myDamageable;
     private Animator myAnimator;
@@ -20,6 +16,7 @@ public class FleeingEnemyBehaviors : MonoBehaviour
 
     private void Awake()
     {
+        navAgent = GetComponent<NavMeshAgent>();
         myDamageable = GetComponent<Damageable>();
         myAnimator = GetComponent<Animator>();
         myDamageable.hasTakenDamage += TakeDamage;
@@ -38,8 +35,8 @@ public class FleeingEnemyBehaviors : MonoBehaviour
         myAnimator.SetTrigger("Alerted");
     }
 
-    //called on update in Enemy_Fleeing_Idle
-    public bool IsAlerted()
+    //called on update in Enemy_Fleeing_Idle, returns true when detecting player.
+    public bool IdleStateBehaviors()
     {
         Vector3 directionToPlayer = (playerRef.transform.position - transform.position).normalized;
 
@@ -63,6 +60,16 @@ public class FleeingEnemyBehaviors : MonoBehaviour
         {
             myAnimator.SetTrigger("AlertIsDone");
         }
+        if (navAgent != null)
+        {
+            navAgent.SetDestination(this.transform.position + playerRef.transform.position);
+        }
+    }
+
+    // called in update in flee state
+    public void RunAwayBehaviors()
+    {
+        navAgent.SetDestination(transform.position + (this.transform.position - playerRef.transform.position));
     }
 
     private void OnTriggerEnter(Collider other)

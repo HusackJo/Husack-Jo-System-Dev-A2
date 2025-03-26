@@ -14,7 +14,7 @@ public class Enemy_Fleeing_Idle : StateMachineBehaviour
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (controller.IsAlerted()) { animator.SetTrigger("Alerted"); }
+        if (controller.IdleStateBehaviors()) { animator.SetTrigger("Alerted"); }
     }
 
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
