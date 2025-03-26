@@ -8,7 +8,6 @@ using UnityEngine.AI;
 
 public class FleeingEnemyBehaviors : MonoBehaviour
 {
-    public float angleToPlayer;
     public float detectionRange, detectionFovAngle;
     //
     private GameManager gameManager;
@@ -45,7 +44,7 @@ public class FleeingEnemyBehaviors : MonoBehaviour
         {
             //angletoplayer = vector3.angle(forward, directiontoplayer)
             Vector3 directionToPlayer = (playerRef.transform.position - transform.position).normalized;
-            angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+            float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
 
             if (angleToPlayer < transform.rotation.z + detectionFovAngle/2)
             {

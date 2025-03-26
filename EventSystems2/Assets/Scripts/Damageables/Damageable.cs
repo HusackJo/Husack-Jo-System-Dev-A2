@@ -6,10 +6,18 @@ public class Damageable : MonoBehaviour
 {
     public delegate void HasTakenDamage();
     public event HasTakenDamage hasTakenDamage;
+    //
     public float maxHealth;
+    public ParticleSystem hitEffect;
+
 
     public void TakeDamage(float amount)
     {
+        if (hitEffect != null)
+        {
+            hitEffect.Play();
+        }
+
         maxHealth -= amount;
         if (maxHealth <= 0)
         {
